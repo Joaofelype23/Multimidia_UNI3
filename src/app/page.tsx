@@ -1,40 +1,42 @@
 'use client'
 
 import { useContext } from "react";
-import {FaPlusCircle, FaMinusCircle, FaPlay, FaPause} from 'react-icons/fa';
+import { FaPlay, FaPause } from 'react-icons/fa';
 import { HomeContext } from "./context/HomeContext";
-import {musics} from "./dados/music";
+import { musics } from "./dados/music";
+import Sidebar from './Sidebar'; 
+import MusicPlayer from './musicplayer';
 
 export default function Home() {
   const {
-     playing,
-     configPlayPause
+    playing,
+    selectedMusic,
+    configPlayPause,
+    selectMusic
   } = useContext(HomeContext);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-       <h1>{playing}</h1>
-       <div className="flex flex-row">
-       <button onClick={()=> configPlayPause()}>
-           {
-            (playing) ? 
-             (<FaPause className="text-[50px] text-[tomato]" />) : 
-             (<FaPlay />)
-           }
-           <div>
-              {
-                musics.map(music => {
-                  return (
-                    <div>
-                      <h1>
-                          {music.author}
-                      </h1>
-                    </div>
-                  )
-                })
-              }
-           </div>
-       </button>
-       </div>
-    </main>
+    <div className="conteiner">
+
+      <Sidebar musics={musics} onSelectMusic={selectMusic} />
+
+      <div className="central">
+        <main className="musicposter">
+          {selectedMusic ? (
+            <div className="poster">
+              <img src={selectedMusic.image} alt={selectedMusic.name} className="ImagemMusica" />
+              <h2 className="nomemusica">{selectedMusic.name}</h2>
+              <p className="autormusica">{selectedMusic.author}</p>
+            {/* <p>{selectedMusic.description}</p> */}
+            </div>
+          ) : (
+            <p>Selenione uma música.</p> 
+          )}
+          <div className="MusicPlayer">
+            <MusicPlayer /> {}
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }
