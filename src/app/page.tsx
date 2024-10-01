@@ -27,7 +27,7 @@ export default function Home() {
               <img src={selectedMusic.image} alt={selectedMusic.name} className="ImagemMusica" />
               <h2 className="nomemusica">{selectedMusic.name}</h2>
               <p className="autormusica">{selectedMusic.author}</p>
-            {/* <p>{selectedMusic.description}</p> */}
+            {}
             </div>
           ) : (
             <p>Selenione uma música.</p> 
