@@ -1,110 +1,84 @@
-'use client'
+"use client";
+import React, { createContext, useState, useEffect } from "react";
+import { Media, mediaFiles } from "../dados/media"; // Atualizado
 
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import { Music, musics } from '../dados/music';
+type HomeContextProps = {
+  playing: boolean;
+  selectedMedia: Media | null;
+  configPlayPause: () => void;
+  selectMedia: (media: Media) => void;
+  playNextMedia: () => void;
+  playPreviousMedia: () => void;
+  mediaElement: HTMLVideoElement | null; // Agora é para vídeo
+  setVolume: (volume: number) => void;
+};
 
-type HomeContextData = {
-    playing: boolean;
-    selectedMusic: Music | null;
-    configPlayPause: () => void;
-    audio: HTMLAudioElement | undefined;
-    selectMusic: (music: Music) => void;
-    setVolume: (volume: number) => void;
-    playNextSong: () => void;
-    playPreviousSong: () => void;
-}
+export const HomeContext = createContext<HomeContextProps | undefined>(undefined);
 
-export const HomeContext = createContext({} as HomeContextData);
+const HomeContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [playing, setPlaying] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+  const [mediaElement, setMediaElement] = useState<HTMLVideoElement | null>(null);
 
-type ProviderProps = {
-    children: ReactNode;
-}
+  useEffect(() => {
+    if (selectedMedia) {
+      const newMedia = document.createElement("video");
+      newMedia.src = selectedMedia.urlMedia;
+      newMedia.volume = 1;
+      setMediaElement(newMedia);
 
-const HomeContextProvider = ({ children }: ProviderProps) => {
-    const [playing, setPlaying] = useState(false);
-    const [audio, setAudio] = useState<HTMLAudioElement | undefined>(undefined);
-    const [selectedMusic, setSelectedMusic] = useState<Music | null>(null);
-
-    useEffect(() => {
-        if (selectedMusic) {
-            const newAudio = new Audio(selectedMusic.urlAudio);
-            newAudio.volume = 1;
-            setAudio(newAudio);
-
-            return () => {
-                newAudio.pause();
-                newAudio.src = '';
-                setAudio(undefined);
-            };
-        }
-    }, [selectedMusic]);
-
-    const configPlayPause = () => {
-        if (playing) {
-            pause();
-        } else {
-            play();
-        }
-        setPlaying(!playing);
+      return () => {
+        newMedia.pause();
+        setMediaElement(null);
+      };
     }
+  }, [selectedMedia]);
 
-    const play = () => {
-        if (audio) {
-            audio.play();
-        }
+  const configPlayPause = () => {
+    if (mediaElement) {
+      if (playing) {
+        mediaElement.pause();
+      } else {
+        mediaElement.play();
+      }
+      setPlaying(!playing);
     }
+  };
 
-    const pause = () => {
-        if (audio) {
-            audio.pause();
-        }
+  const playNextMedia = () => {
+    const currentIndex = mediaFiles.findIndex((m) => m === selectedMedia);
+    const nextIndex = (currentIndex + 1) % mediaFiles.length;
+    setSelectedMedia(mediaFiles[nextIndex]);
+  };
+
+  const playPreviousMedia = () => {
+    const currentIndex = mediaFiles.findIndex((m) => m === selectedMedia);
+    const prevIndex = (currentIndex - 1 + mediaFiles.length) % mediaFiles.length;
+    setSelectedMedia(mediaFiles[prevIndex]);
+  };
+
+  const setVolume = (volume: number) => {
+    if (mediaElement) {
+      mediaElement.volume = volume;
     }
+  };
 
-    const selectMusic = (music: Music) => {
-        setSelectedMusic(music);
-        setPlaying(false);
-    }
-
-    const setVolume = (volume: number) => {
-        if (audio) {
-            audio.volume = volume;
-        }
-    }
-
-    const playNextSong = () => {
-        if (selectedMusic) {
-            const currentIndex = musics.findIndex(music => music.name === selectedMusic.name);
-            const nextIndex = (currentIndex + 1) % musics.length;
-            const nextMusic = musics[nextIndex];
-            selectMusic(nextMusic);
-            play();
-        }
-    }
-
-    const playPreviousSong = () => {
-        if (selectedMusic) {
-            const currentIndex = musics.findIndex(music => music.name === selectedMusic.name);
-            const previousIndex = (currentIndex - 1 + musics.length) % musics.length;
-            const previousMusic = musics[previousIndex];
-            selectMusic(previousMusic);
-            play();
-        }
-    }
-
-    return (
-        <HomeContext.Provider value={{
-            playing,
-            selectedMusic,
-            configPlayPause,
-            selectMusic,
-            audio,
-            setVolume,          
-            playNextSong,
-            playPreviousSong
-        }}>
-            {children}
-        </HomeContext.Provider>
-    )
-}
+  return (
+    <HomeContext.Provider
+      value={{
+        playing,
+        selectedMedia,
+        configPlayPause,
+        selectMedia: setSelectedMedia,
+        playNextMedia,
+        playPreviousMedia,
+        mediaElement,
+        setVolume,
+      }}
+    >
+      {children}
+    </HomeContext.Provider>
+  );
+};
 
 export default HomeContextProvider;

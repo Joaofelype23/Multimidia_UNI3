@@ -1,39 +1,34 @@
+// Home.tsx
 'use client'
 
 import { useContext } from "react";
-import { FaPlay, FaPause } from 'react-icons/fa';
 import { HomeContext } from "./context/HomeContext";
-import { musics } from "./dados/music";
-import Sidebar from './Sidebar'; 
-import MusicPlayer from './musicplayer';
+import { mediaFiles } from "./dados/media"; // Alterado para lidar com vídeos
+import Sidebar from './Sidebar';
+import VideoPlayer from './videoplayer';
 
 export default function Home() {
   const {
-    playing,
-    selectedMusic,
-    configPlayPause,
-    selectMusic
+    selectedMedia,
+    selectMedia,
   } = useContext(HomeContext);
 
   return (
     <div className="conteiner">
-
-      <Sidebar musics={musics} onSelectMusic={selectMusic} />
-
+      <Sidebar mediaFiles={mediaFiles} onSelectMedia={selectMedia} />
       <div className="central">
         <main className="musicposter">
-          {selectedMusic ? (
+          {selectedMedia ? (
             <div className="poster">
-              <img src={selectedMusic.image} alt={selectedMusic.name} className="ImagemMusica" />
-              <h2 className="nomemusica">{selectedMusic.name}</h2>
-              <p className="autormusica">{selectedMusic.author}</p>
-            {}
+              <img src={selectedMedia.image} alt={selectedMedia.name} className="ImagemMusica" />
+              <h2 className="nomemusica">{selectedMedia.name}</h2>
+              <p className="autormusica">{selectedMedia.author}</p>
             </div>
           ) : (
-            <p>Selenione uma música.</p> 
+            <p>Selecione um vídeo.</p>
           )}
-          <div className="MusicPlayer">
-            <MusicPlayer /> {}
+          <div className="VideoPlayer">
+            <VideoPlayer />
           </div>
         </main>
       </div>

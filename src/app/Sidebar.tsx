@@ -1,28 +1,31 @@
+"use client";
 import React from 'react';
-import { Music } from './dados/music'; 
+import { Media } from './dados/media';
 
 type SidebarProps = {
-    musics: Music[];
-    onSelectMusic: (music: Music) => void;
+    mediaFiles: Media[];
+    onSelectMedia: (media: Media) => void;
+    selectedMedia: Media | null; // Adicionando uma propriedade para o item selecionado
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ musics, onSelectMusic }) => {
+const Sidebar: React.FC<SidebarProps> = ({ mediaFiles, onSelectMedia, selectedMedia }) => {
     return (
         <div className="sidebar">
-            <h2 className="tituloSidebar">Minha Playlist</h2>
+            <h2 className="tituloSidebar">Minha Playlist de Vídeos</h2>
             <ul>
-                {musics.map(music => (
+                {mediaFiles.map(media => (
                     <li
-                        key={music.name}
-                        className="cursor-pointer"
-                        onClick={() => onSelectMusic(music)}
+                        key={media.name}
+                        className={`cursor-pointer p-2 rounded-lg transition duration-200 ${selectedMedia?.name === media.name ? 'bg-gray-700' : ''}`} // Estilo para o item selecionado
+                        onClick={() => onSelectMedia(media)}
                     >
-                        <h3 className="nomemusica">{music.name}</h3>
-                        <p className="autormusica">{music.author}</p>
+                        <h3 className="nomemusica">{media.name}</h3>
+                        <p className="autormusica">{media.author}</p>
                     </li>
                 ))}
             </ul>
         </div>
     );
 }
+
 export default Sidebar;
